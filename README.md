@@ -1,8 +1,8 @@
 # RV32IM RISC-V Processor
 
-![RISC-V](https://img.shields.io/badge/ISA-RV32IM-blue.svg)
-![Pipeline](https://img.shields.io/badge/Pipeline-5_Stage-brightgreen.svg)
-![Status](https://img.shields.io/badge/Status-Synthesizable-orange.svg)
+![Language](https://img.shields.io/badge/Language-Verilog-blue.svg)
+![Tools](https://img.shields.io/badge/Tool-Xilinx_Vivado-red.svg)
+![Status](https://img.shields.io/badge/Status-In_Development-yellow.svg)
 
 A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor implementing the standard **RV32IM** instruction set architecture, designed from scratch in Verilog. This project explores advanced computer architecture and pipelined dataflow. It is built to serve as a lightweight, efficient compute core for applications.
 

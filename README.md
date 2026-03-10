@@ -17,9 +17,10 @@ A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor i
 ## Project Structure
 
 ```
-├── constraint
+rv32im-riscv-processor/
+├── constraint/
 │   └── Arty-Z7-20-Master.xdc
-└── rtl
+└── rtl/
     ├── cla.v
     ├── dataPathPipelined.v
     ├── dividerUnsignedPipelined.v

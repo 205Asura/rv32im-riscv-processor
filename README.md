@@ -2,19 +2,18 @@
 
 ![Language](https://img.shields.io/badge/Language-Verilog-blue.svg)
 ![Tools](https://img.shields.io/badge/Tool-Xilinx_Vivado-red.svg)
-![Status](https://img.shields.io/badge/Status-In_Development-yellow.svg)
+
 
 A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor implementing the standard **RV32IM** instruction set architecture, designed from scratch in Verilog. This project explores advanced computer architecture and pipelined dataflow. It is built to serve as a lightweight, efficient compute core for applications.
 
 
 ## Table of Contents
-1. [Table of Contents](#1-table-of-contents)
-2. [Project Structure](#2-project-structure)
-3. [Architecture Overview](#3-architecture-overview)
-4. [Pipeline Deep Dive](#4-pipeline-deep-dive)
-5. [Supported Instructions](#5-supported-instructions)
+1. [Project Structure](#1-project-structure)
+2. [Architecture Overview](#2-architecture-overview)
+3. [Pipeline Deep Dive](#3-pipeline-deep-dive)
+4. [Supported Instructions](#4-supported-instructions)
 
-## Project Structure
+## 1. Project Structure
 
 ```
 rv32im-riscv-processor/
@@ -30,7 +29,7 @@ rv32im-riscv-processor/
     └── riscv_top.v
 ```
 
-## Architecture Overview
+## 2. Architecture Overview
 
 The processor implements the classic RISC 5-stage pipeline with robust hazard mitigation. 
 
@@ -40,7 +39,7 @@ The processor implements the classic RISC 5-stage pipeline with robust hazard mi
 * **Custom Execution Units:** Features a custom Carry Lookahead Adder (CLA) for rapid arithmetic and a dedicated 8-cycle pipelined unsigned divider for the 'M' extension.
 
 
-## Pipeline Deep Dive
+## 3. Pipeline Deep Dive
 
 ### 1. Fetch (IF)
 Computes the next Program Counter (PC). Under normal execution, `PC = PC + 4`. If a branch or jump is taken, the Fetch unit cleanly recovers by fetching from the calculated target address, flushing the subsequent decode stage.
@@ -62,7 +61,7 @@ Interfaces with the single-cycle memory module. Features precise byte-alignment 
 Selects between Memory Read Data and ALU Results to retire the instruction and write the final value back to the Register File.
 
 
-## Supported Instructions
+## 4. Supported Instructions
 
 This core fully implements the Unprivileged RV32I base integer instruction set and the M-Extension.
 

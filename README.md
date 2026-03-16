@@ -10,7 +10,7 @@ A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor i
 ## Table of Contents
 1. [Project Structure](#1-project-structure)
 2. [Architecture Overview](#2-architecture-overview)
-3. [Pipeline Deep Dive](#3-pipeline-deep-dive)
+3. [Pipeline Stages](#3-pipeline-stages)
 4. [Supported Instructions](#4-supported-instructions)
 
 ## 1. Project Structure
@@ -39,7 +39,7 @@ The processor implements the classic RISC 5-stage pipeline with robust hazard mi
 * **Custom Execution Units:** Features a custom Carry Lookahead Adder (CLA) for rapid arithmetic and a dedicated 8-cycle pipelined unsigned divider for the 'M' extension.
 
 
-## 3. Pipeline Deep Dive
+## 3. Pipeline Stages
 
 ### 1. Fetch (IF)
 Computes the next Program Counter (PC). Under normal execution, `PC = PC + 4`. If a branch or jump is taken, the Fetch unit cleanly recovers by fetching from the calculated target address, flushing the subsequent decode stage.

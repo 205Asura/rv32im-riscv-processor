@@ -19,14 +19,19 @@ A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor i
 rv32im-riscv-processor/
 ├── constraint/
 │   └── Arty-Z7-20-Master.xdc
-└── rtl/
-    ├── cla.v
-    ├── dataPathPipelined.v
-    ├── dividerUnsignedPipelined.v
-    ├── header.vh
-    ├── memory.v
-    ├── regfile.v
-    └── riscv_top.v
+├── rtl/
+│   ├── cla.v
+│   ├── dataPathPipelined.v
+│   ├── dividerUnsignedPipelined.v
+│   ├── header.vh
+│   ├── memory.v
+│   ├── regfile.v
+│   ├── riscv_top.v
+│   └── rv32im-riscv.yaml
+├── sim/
+│   └── run.do
+└── tb/
+    └── tb_riscv_top.v
 ```
 
 ## 2. Architecture Overview

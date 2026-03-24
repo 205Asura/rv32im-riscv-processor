@@ -14,7 +14,7 @@ module tb_riscv_top;
     // ========================================================================
     // 2. INSTANTIATE PROCESSOR
     // ========================================================================
-    riscv_top uut (
+    riscv_top dut (
         .clk(clk),
         .rst(rst),
         .halt(halt),
@@ -55,7 +55,7 @@ module tb_riscv_top;
             $fclose(f);
             
             // Reload memory
-            $readmemh("mem_initial_contents_test.hex", uut.memory.mem_array);
+            $readmemh("mem_initial_contents_test.hex", dut.memory.mem_array);
             $display("[INFO] Program loaded (%0d instructions).", num_insts);
         end
     endtask
@@ -73,7 +73,7 @@ module tb_riscv_top;
         
         reg [31:0] actual_val;
         begin
-            actual_val = uut.datapath.rf.regs[reg_num]; // Get value from DUT
+            actual_val = dut.datapath.rf.regs[reg_num]; // Get value from DUT
 
             if (actual_val === expected_val) begin
                 if (is_signed)
@@ -120,7 +120,7 @@ module tb_riscv_top;
         rst = 1; #20; @(negedge clk) rst = 0;
         wait(halt); @(posedge clk); // Wait for the cycle to actually finish
         #1;
-        $display("[INFO] Program 1 Cycles: %0d", uut.datapath.cycles_current);
+        $display("[INFO] Program 1 Cycles: %0d", dut.datapath.cycles_current);
         
         // check_result(NAME, REG_NUM, EXPECTED_VALUE, IS_SIGNED)
         check_result("ADDI ", 1, 32'hFFFFFFFF, 0); // Display as Hex
@@ -157,7 +157,7 @@ module tb_riscv_top;
         rst = 1; #20; @(negedge clk) rst = 0;
         wait(halt); @(posedge clk); // Wait for the cycle to actually finish
         #1;
-        $display("[INFO] Program 2 Cycles: %0d", uut.datapath.cycles_current);
+        $display("[INFO] Program 2 Cycles: %0d", dut.datapath.cycles_current);
 
         check_result("ADD  ", 4, 13, 1);
         check_result("SUB  ", 5, 7, 1);
@@ -198,7 +198,7 @@ module tb_riscv_top;
         rst = 1; #20; @(negedge clk) rst = 0;
         wait(halt); @(posedge clk); // Wait for the cycle to actually finish
         #1;
-        $display("[INFO] Program 3 Cycles: %0d", uut.datapath.cycles_current);
+        $display("[INFO] Program 3 Cycles: %0d", dut.datapath.cycles_current);
 
         check_result("LUI  ", 1, 32'h12345000, 0);
         check_result("Branch", 4, 1, 1); // Expect x4 = 1 (Success flag)
@@ -226,7 +226,7 @@ module tb_riscv_top;
         wait(halt); @(posedge clk); // Wait for the cycle to actually finish
         #1;
         
-        $display("[INFO] Program 4 Cycles: %0d", uut.datapath.cycles_current);
+        $display("[INFO] Program 4 Cycles: %0d", dut.datapath.cycles_current);
 
         check_result("SW/LW", 3, 32'hDEADBEEF, 0);
         check_result("LB   ", 4, 32'hFFFFFFEF, 0);
@@ -255,7 +255,7 @@ module tb_riscv_top;
         
         wait(halt); @(posedge clk); // Wait for the cycle to actually finish
         #1;
-        $display("[INFO] Program 5 Cycles: %0d", uut.datapath.cycles_current);
+        $display("[INFO] Program 5 Cycles: %0d", dut.datapath.cycles_current);
 
         check_result("MUL  ", 4, -100, 1);
         check_result("MULH ", 5, -1, 1);

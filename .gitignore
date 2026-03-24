@@ -1,0 +1,12 @@
+work/
+
+.venv/
+.vscode/
+
+transcript
+*.log
+*.wlf
+*.vcd
+*.fst
+
+*.yaml

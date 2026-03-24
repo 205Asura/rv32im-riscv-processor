@@ -6,14 +6,14 @@ module memory #(
 ) (
     input                    rst,
     input                    clk,
-    input      [`REG_SIZE:0] pc_to_imem,
-    output reg [`REG_SIZE:0] inst_from_imem,
-    input      [`REG_SIZE:0] addr_to_dmem,
-    output reg [`REG_SIZE:0] load_data_from_dmem,
-    input      [`REG_SIZE:0] store_data_to_dmem,
+    input      [`REG_SIZE-1:0] pc_to_imem,
+    output reg [`REG_SIZE-1:0] inst_from_imem,
+    input      [`REG_SIZE-1:0] addr_to_dmem,
+    output reg [`REG_SIZE-1:0] load_data_from_dmem,
+    input      [`REG_SIZE-1:0] store_data_to_dmem,
     input      [        3:0] store_we_to_dmem
 );
-    reg [`REG_SIZE:0] mem_array[0:NUM_WORDS-1];
+    reg [`REG_SIZE-1:0] mem_array[0:NUM_WORDS-1];
 
     initial begin
         $readmemh("mem_initial_contents.hex", mem_array);

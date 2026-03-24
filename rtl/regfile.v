@@ -3,17 +3,17 @@
 
 module RegFile (
     input      [        4:0] rd,
-    input      [`REG_SIZE:0] rd_data,
+    input      [`REG_SIZE-1:0] rd_data,
     input      [        4:0] rs1,
-    output reg [`REG_SIZE:0] rs1_data,
+    output reg [`REG_SIZE-1:0] rs1_data,
     input      [        4:0] rs2,
-    output reg [`REG_SIZE:0] rs2_data,
+    output reg [`REG_SIZE-1:0] rs2_data,
     input                    clk,
     input                    we,
     input                    rst
 );
     localparam NumRegs = 32;
-    reg [`REG_SIZE:0] regs[0:NumRegs-1];
+    reg [`REG_SIZE-1:0] regs[0:NumRegs-1];
     integer i;
 
     // Synchronous Write

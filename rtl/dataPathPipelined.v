@@ -4,35 +4,35 @@
 module DatapathPipelined (
     input                     clk,
     input                     rst,
-    output     [ `REG_SIZE:0] pc_to_imem,
-    input      [`INST_SIZE:0] inst_from_imem,
+    output     [ `REG_SIZE-1:0] pc_to_imem,
+    input      [`INST_SIZE-1:0] inst_from_imem,
     // dmem is read/write
-    output reg [ `REG_SIZE:0] addr_to_dmem,
-    input      [ `REG_SIZE:0] load_data_from_dmem,
-    output reg [ `REG_SIZE:0] store_data_to_dmem,
+    output reg [ `REG_SIZE-1:0] addr_to_dmem,
+    input      [ `REG_SIZE-1:0] load_data_from_dmem,
+    output reg [ `REG_SIZE-1:0] store_data_to_dmem,
     output reg [         3:0] store_we_to_dmem,
     output reg                halt,
     // The PC of the inst currently in Writeback. 0 if not a valid inst.
-    output reg [ `REG_SIZE:0] trace_writeback_pc,
+    output reg [ `REG_SIZE-1:0] trace_writeback_pc,
     // The bits of the inst currently in Writeback. 0 if not a valid inst.
-    output reg [`INST_SIZE:0] trace_writeback_inst
+    output reg [`INST_SIZE-1:0] trace_writeback_inst
 );
     // =========================================================================
     // Opcodes & Constants
     // =========================================================================
-    localparam [`OPCODE_SIZE:0] OpLoad    = 7'b00_000_11;
-    localparam [`OPCODE_SIZE:0] OpStore   = 7'b01_000_11;
-    localparam [`OPCODE_SIZE:0] OpBranch  = 7'b11_000_11;
-    localparam [`OPCODE_SIZE:0] OpJalr    = 7'b11_001_11;
-    localparam [`OPCODE_SIZE:0] OpJal     = 7'b11_011_11;
-    localparam [`OPCODE_SIZE:0] OpRegImm  = 7'b00_100_11;
-    localparam [`OPCODE_SIZE:0] OpRegReg  = 7'b01_100_11;
-    localparam [`OPCODE_SIZE:0] OpEnviron = 7'b11_100_11;
-    localparam [`OPCODE_SIZE:0] OpAuipc   = 7'b00_101_11;
-    localparam [`OPCODE_SIZE:0] OpLui     = 7'b01_101_11;
+    localparam [`OPCODE_SIZE-1:0] OpLoad    = 7'b00_000_11;
+    localparam [`OPCODE_SIZE-1:0] OpStore   = 7'b01_000_11;
+    localparam [`OPCODE_SIZE-1:0] OpBranch  = 7'b11_000_11;
+    localparam [`OPCODE_SIZE-1:0] OpJalr    = 7'b11_001_11;
+    localparam [`OPCODE_SIZE-1:0] OpJal     = 7'b11_011_11;
+    localparam [`OPCODE_SIZE-1:0] OpRegImm  = 7'b00_100_11;
+    localparam [`OPCODE_SIZE-1:0] OpRegReg  = 7'b01_100_11;
+    localparam [`OPCODE_SIZE-1:0] OpEnviron = 7'b11_100_11;
+    localparam [`OPCODE_SIZE-1:0] OpAuipc   = 7'b00_101_11;
+    localparam [`OPCODE_SIZE-1:0] OpLui     = 7'b01_101_11;
 
     // Cycle Counter
-    reg [`REG_SIZE:0] cycles_current;
+    reg [`REG_SIZE-1:0] cycles_current;
     always @(posedge clk) begin
         if (rst) cycles_current <= 0;
         else cycles_current <= cycles_current + 1;

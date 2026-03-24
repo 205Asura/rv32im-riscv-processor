@@ -5,11 +5,11 @@ module riscv_top (
     input                 clk,
     input                 rst,
     output                halt,
-    output [ `REG_SIZE:0] trace_writeback_pc,
-    output [`INST_SIZE:0] trace_writeback_inst
+    output [ `REG_SIZE-1:0] trace_writeback_pc,
+    output [`INST_SIZE-1:0] trace_writeback_inst
 );
-    wire [`INST_SIZE:0] inst_from_imem;
-    wire [ `REG_SIZE:0] pc_to_imem, mem_data_addr, mem_data_loaded_value, mem_data_to_write;
+    wire [`INST_SIZE-1:0] inst_from_imem;
+    wire [ `REG_SIZE-1:0] pc_to_imem, mem_data_addr, mem_data_loaded_value, mem_data_to_write;
     wire [         3:0] mem_data_we;
     wire [(8*32)-1:0] test_case;
 

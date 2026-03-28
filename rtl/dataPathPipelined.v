@@ -20,16 +20,16 @@ module DatapathPipelined (
     // =========================================================================
     // Opcodes & Constants
     // =========================================================================
-    localparam [`OPCODE_SIZE-1:0] OpLoad    = 7'b00_000_11;
-    localparam [`OPCODE_SIZE-1:0] OpStore   = 7'b01_000_11;
-    localparam [`OPCODE_SIZE-1:0] OpBranch  = 7'b11_000_11;
-    localparam [`OPCODE_SIZE-1:0] OpJalr    = 7'b11_001_11;
-    localparam [`OPCODE_SIZE-1:0] OpJal     = 7'b11_011_11;
-    localparam [`OPCODE_SIZE-1:0] OpRegImm  = 7'b00_100_11;
-    localparam [`OPCODE_SIZE-1:0] OpRegReg  = 7'b01_100_11;
-    localparam [`OPCODE_SIZE-1:0] OpEnviron = 7'b11_100_11;
-    localparam [`OPCODE_SIZE-1:0] OpAuipc   = 7'b00_101_11;
-    localparam [`OPCODE_SIZE-1:0] OpLui     = 7'b01_101_11;
+    localparam [`OPCODE_SIZE-1:0] OpLoad    = 7'b000_0011;
+    localparam [`OPCODE_SIZE-1:0] OpStore   = 7'b010_0011;
+    localparam [`OPCODE_SIZE-1:0] OpBranch  = 7'b110_0011;
+    localparam [`OPCODE_SIZE-1:0] OpJalr    = 7'b110_0111;
+    localparam [`OPCODE_SIZE-1:0] OpJal     = 7'b110_1111;
+    localparam [`OPCODE_SIZE-1:0] OpRegImm  = 7'b001_0011;
+    localparam [`OPCODE_SIZE-1:0] OpRegReg  = 7'b011_0011;
+    localparam [`OPCODE_SIZE-1:0] OpEnviron = 7'b111_0011;
+    localparam [`OPCODE_SIZE-1:0] OpAuipc   = 7'b001_0111;
+    localparam [`OPCODE_SIZE-1:0] OpLui     = 7'b011_0111;
 
     // Cycle Counter
     reg [`REG_SIZE-1:0] cycles_current;
@@ -127,9 +127,8 @@ module DatapathPipelined (
 
     assign pc_to_imem = f_pc;
 
-    // =========================================================================
+    
     // 2. DECODE STAGE (D)
-    // =========================================================================
 
     wire [6:0] d_opcode = d_inst[6:0];
     wire [4:0] d_rd     = d_inst[11:7];
@@ -168,7 +167,7 @@ module DatapathPipelined (
         .rs2(d_rs2), .rs2_data(rf_rs2_data)
     );
     
-    // WD BYPASS: Forwarding from WB stage to Decode stage
+    // WD BYPASS: Forwarding from WB stage to Decode stage, RAW Hazard handling
     reg [31:0] d_rs1_data_bypassed;
     reg [31:0] d_rs2_data_bypassed;
 
@@ -199,9 +198,9 @@ module DatapathPipelined (
                       (d_opcode == OpBranch);
 
     // Load-Use Hazard: 
-    wire load_use_hazard = x_mem_read && (x_rd != 0) && (
+    wire load_use_hazard = x_mem_read && (x_rd != 0) && ( // if the current ins at X is load, and it load to the reg which the current ins in D will use
                            (d_uses_rs1 && (x_rd == d_rs1)) || 
-                           (d_uses_rs2 && (x_rd == d_rs2) && !d_is_store) 
+                           (d_uses_rs2 && (x_rd == d_rs2) && !d_is_store) // if it load to rs2, it need to be not a store ins (because store ins only need rs2 at M)
     );
 
     // Control to pass to Execute
@@ -244,9 +243,7 @@ module DatapathPipelined (
         end
     end
 
-    // =========================================================================
     // 3. EXECUTE STAGE (X)
-    // =========================================================================
 
     wire [4:0] x_rs1 = x_inst[19:15];
     wire [4:0] x_rs2 = x_inst[24:20];
@@ -260,9 +257,9 @@ module DatapathPipelined (
 
     always @(*) begin
         // Forward A (RS1)
-        if (m_reg_write && (m_rd != 0) && (m_rd == x_rs1) && !m_mem_read)
+        if (m_reg_write && (m_rd != 0) && (m_rd == x_rs1) && !m_mem_read) // SW -> ADD, forward from M to X
             forward_a_val = m_alu_res;
-        else if (w_reg_write && (w_rd != 0) && (w_rd == x_rs1))
+        else if (w_reg_write && (w_rd != 0) && (w_rd == x_rs1)) // SW -> INS -> ADD, forward from W to X
             forward_a_val = w_write_data;
         else
             forward_a_val = x_rs1_data;
@@ -278,23 +275,22 @@ module DatapathPipelined (
     // ALU Operands
     wire [31:0] alu_op_a = (x_op == OpAuipc) ? x_pc : forward_a_val;
     // [NOTE] Correctly selecting immediate for I-Type, including Shifts
-    wire [31:0] alu_op_b_mux = (x_op == OpRegReg || x_op == OpBranch) ? forward_b_val : x_imm;
-    wire [31:0] alu_op_b = alu_op_b_mux;
+    wire [31:0] alu_op_b = (x_op == OpRegReg || x_op == OpBranch) ? forward_b_val : x_imm;
 
-    // --- CLA INSTANTIATION ---
-    wire is_sub = (x_op == OpRegReg && x_f3 == 3'b000 && x_f7 == 7'b0100000) ||
+    // CLA 
+    wire is_sub_2reg = (x_op == OpRegReg && x_f3 == 3'b000 && x_f7 == 7'b0100000) ||
                   (x_op == OpBranch);
-    wire [31:0] cla_b_in = is_sub ? ~alu_op_b : alu_op_b;
+    wire [31:0] cla_b_in = is_sub_2reg ? ~alu_op_b : alu_op_b;
     wire [31:0] cla_sum;
-    cla cla_inst (.a(alu_op_a), .b(cla_b_in), .cin(is_sub), .sum(cla_sum));
+    cla cla_dut (.a(alu_op_a), .b(cla_b_in), .cin(is_sub_2reg), .sum(cla_sum));
 
-    // --- DIVIDER LOGIC ---
+    // DIVIDER
     assign x_is_div = (x_op == OpRegReg) && (x_f7 == 7'd1) && (x_f3[2] == 1);
     
     wire [31:0] div_quo, div_rem;
     
     wire is_signed_div = (x_f3 == 3'b100) || (x_f3 == 3'b110);
-    wire div_sign_dvd  = is_signed_div & forward_a_val[31];
+    wire div_sign_dvd  = is_signed_div & forward_a_val[31]; // treat the operands as negative if signed ins, and MSB is 1
     wire div_sign_div  = is_signed_div & forward_b_val[31];
     wire [31:0] abs_dvd = div_sign_dvd ? (~forward_a_val + 1) : forward_a_val;
     wire [31:0] abs_div = div_sign_div ? (~forward_b_val + 1) : forward_b_val;
@@ -306,7 +302,7 @@ module DatapathPipelined (
     );
 
     wire quo_neg = is_signed_div & (div_sign_dvd ^ div_sign_div);
-    wire rem_neg = is_signed_div & div_sign_dvd;
+    wire rem_neg = is_signed_div & div_sign_dvd; // remainder's sign must be the same as dividend's sign
     wire [31:0] final_quo = quo_neg ? (~div_quo + 1) : div_quo;
     wire [31:0] final_rem = rem_neg ? (~div_rem + 1) : div_rem;
 
@@ -324,7 +320,7 @@ module DatapathPipelined (
     end
     assign div_stall = x_is_div && (div_counter < 8);
 
-    // --- ALU RESULT SELECTION ---
+    // ALU RESULT SELECTION
     reg [31:0] alu_result;
     reg [63:0] mul_res;
     always @(*) begin
@@ -360,12 +356,12 @@ module DatapathPipelined (
             // Standard ALU
             case (x_f3)
                 3'b000: alu_result = cla_sum; // add/sub
-                // [FIX] Shift Left: Logical only
+                // Shift Left: Logical only
                 3'b001: alu_result = forward_a_val << alu_op_b[4:0]; // sll/slli
                 3'b010: alu_result = ($signed(forward_a_val) < $signed(alu_op_b)) ? 1 : 0; // slt
                 3'b011: alu_result = (forward_a_val < alu_op_b) ? 1 : 0; // sltu
                 3'b100: alu_result = forward_a_val ^ alu_op_b; // xor
-                // [FIX] Shift Right: Arithmetic (SRA/SRAI) if bit 30 is set, else Logical (SRL/SRLI)
+                // Shift Right: Arithmetic (SRA/SRAI) if bit 30 is set, else Logical (SRL/SRLI)
                 // Use explicit x_inst[30] to check 'funct7' bit for I-types too.
                 3'b101: begin
                     if (x_inst[30]) // SRA or SRAI

@@ -1,0 +1,15 @@
+if {[file exists work]} { vdel -lib work -all }
+
+vlib work
+
+if {[llength [glob -nocomplain ../../rtl/*.v]] > 0} { vlog -work work ../rtl/*.v }
+if {[llength [glob -nocomplain ../../rtl/*.vh]] > 0} { vlog -work work ../rtl/*.vh }
+if {[llength [glob -nocomplain ../../rtl/*.sv]] > 0} { vlog -work work ../rtl/*.sv }
+
+if {[llength [glob -nocomplain ../../tb/*.v]] > 0} { vlog -work work ../tb/*.v }
+if {[llength [glob -nocomplain ../../tb/*.sv]] > 0} { vlog -work work ../tb/*.sv }
+
+vsim -voptargs=+acc work.tb_riscv_top
+
+add wave -position insertpoint sim:/tb_riscv_top/dut/*
+run -all

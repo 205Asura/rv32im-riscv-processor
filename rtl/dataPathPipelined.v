@@ -329,7 +329,7 @@ module DatapathPipelined (
         mul_res = 64'd0;
 
         if (x_op == OpLui) alu_result = x_imm;
-        else if (x_op == OpJal || x_op == OpJalr) alu_result = x_pc + 4;
+        else if (x_op == OpJal || x_op == OpJalr) alu_result = x_pc + 4; // jump and then comeback to the next ins
         else if (x_is_div) begin
              // DIV/REM selection
              case (x_f3)
@@ -361,11 +361,10 @@ module DatapathPipelined (
                 3'b010: alu_result = ($signed(forward_a_val) < $signed(alu_op_b)) ? 1 : 0; // slt
                 3'b011: alu_result = (forward_a_val < alu_op_b) ? 1 : 0; // sltu
                 3'b100: alu_result = forward_a_val ^ alu_op_b; // xor
-                // Shift Right: Arithmetic (SRA/SRAI) if bit 30 is set, else Logical (SRL/SRLI)
-                // Use explicit x_inst[30] to check 'funct7' bit for I-types too.
+                // Shift Right: Arithmetic (SRA/SRAI) if bit 30 is set (funct7 = 0x20), else Logical (SRL/SRLI)
                 3'b101: begin
-                    if (x_inst[30]) // SRA or SRAI
-                        alu_result = $signed(forward_a_val) >>> alu_op_b[4:0];
+                    if (x_inst[30]) // SRA or SRAI (arithmetic shift)
+                        alu_result = $signed(forward_a_val) >>> alu_op_b[4:0]; 
                     else            // SRL or SRLI
                         alu_result = forward_a_val >> alu_op_b[4:0];
                 end
@@ -376,7 +375,7 @@ module DatapathPipelined (
         end
     end
 
-    // --- BRANCH & JUMP LOGIC ---
+    // BRANCH & JUMP LOGIC
     reg br_cond;
     always @(*) begin
         case (x_f3)
@@ -423,10 +422,9 @@ module DatapathPipelined (
         end
     end
     
-    // =========================================================================
+    
     // 4. MEMORY STAGE (M)
-    // =========================================================================
-
+    
     // WM BYPASS
     reg [31:0] store_val_final;
     always @(*) begin
@@ -446,21 +444,21 @@ module DatapathPipelined (
             case (m_inst[14:12]) 
                 3'b000: begin // sb
                     case (m_alu_res[1:0])
-                        2'b00: begin store_we_to_dmem = 4'b0001; store_data_to_dmem[7:0] = store_val_final[7:0]; end
-                        2'b01: begin store_we_to_dmem = 4'b0010; store_data_to_dmem[15:8] = store_val_final[7:0]; end
-                        2'b10: begin store_we_to_dmem = 4'b0100; store_data_to_dmem[23:16] = store_val_final[7:0]; end
-                        2'b11: begin store_we_to_dmem = 4'b1000; store_data_to_dmem[31:24] = store_val_final[7:0]; end
+                        2'b00: begin store_we_to_dmem = 4'b0001; store_data_to_dmem[7:0] = store_val_final[7:0]; end // 1st byte of a word
+                        2'b01: begin store_we_to_dmem = 4'b0010; store_data_to_dmem[15:8] = store_val_final[7:0]; end // 2nd byte
+                        2'b10: begin store_we_to_dmem = 4'b0100; store_data_to_dmem[23:16] = store_val_final[7:0]; end // 3rd byte
+                        2'b11: begin store_we_to_dmem = 4'b1000; store_data_to_dmem[31:24] = store_val_final[7:0]; end // 4th byte
                     endcase
                 end
                 3'b001: begin // sh
                     case (m_alu_res[1])
-                        1'b0: begin store_we_to_dmem = 4'b0011; store_data_to_dmem[15:0] = store_val_final[15:0]; end
-                        1'b1: begin store_we_to_dmem = 4'b1100; store_data_to_dmem[31:16] = store_val_final[15:0]; end
+                        1'b0: begin store_we_to_dmem = 4'b0011; store_data_to_dmem[15:0] = store_val_final[15:0]; end // 1st half-word of a word 
+                        1'b1: begin store_we_to_dmem = 4'b1100; store_data_to_dmem[31:16] = store_val_final[15:0]; end // 2nd half-word
                     endcase
                 end
                 3'b010: begin // sw
-                    store_we_to_dmem = 4'b1111;
-                    store_data_to_dmem = store_val_final;
+                    store_we_to_dmem = 4'b1111; // full word
+                    store_data_to_dmem = store_val_final; 
                 end
             endcase
         end
@@ -513,10 +511,7 @@ module DatapathPipelined (
         end
     end
 
-    // =========================================================================
     // 5. WRITEBACK STAGE (W)
-    // =========================================================================
-
     assign w_write_data = (w_inst[6:0] == OpLoad) ? w_mem_data : w_alu_res;
 
     always @(*) begin

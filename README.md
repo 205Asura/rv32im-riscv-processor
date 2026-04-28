@@ -17,8 +17,7 @@ A highly optimized, synthesizable 5-stage pipelined RISC-V soft-core processor i
 
 ```
 rv32im-riscv-processor/
-├── constraint/
-│   └── Arty-Z7-20-Master.xdc
+├── README.md
 ├── rtl/
 │   ├── cla.v
 │   ├── dataPathPipelined.v
@@ -26,12 +25,25 @@ rv32im-riscv-processor/
 │   ├── header.vh
 │   ├── memory.v
 │   ├── regfile.v
-│   ├── riscv_top.v
-│   └── rv32im-riscv.yaml
-├── sim/
-│   └── run.do
+│   └── riscv_top.v
+├── scripts/
+│   ├── gds/
+│   │   └── gds.py
+│   ├── pd/
+│   │   ├── constraints.sdc
+│   │   ├── constraints.xdc
+│   │   ├── pd_poststa.tcl
+│   │   └── riscv_top.def
+│   ├── sim/
+│   │   └── run.do
+│   ├── sta/
+│   └── synth/
+│       ├── riscv_top_netlist.v
+│       └── synth.tcl
 └── tb/
-    └── tb_riscv_top.v
+    ├── Makefile
+    ├── tb_riscv_top.v
+    └── testbench.py
 ```
 
 ## 2. Architecture Overview

@@ -3,6 +3,13 @@ work/
 .venv/
 .vscode/
 
+tb/temp.bin
+tb/temp.o
+tb/temp.s
+tb/*.xml
+tb/sim_build
+tb/__pycache__
+
 transcript
 *.log
 *.wlf

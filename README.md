@@ -92,7 +92,7 @@ This core fully implements the Unprivileged RV32I base integer instruction set a
 | Environment                        | `ecall`                                                                |
 | M-Extension (Multiply/Divide)      | `mul`, `mulh`, `mulhsu`, `mulhu`, `div`, `divu`, `rem`, `remu`         |
 
-# 5. Simulation
+## 5. Simulation
 To run all tests:
 ```
 cd tb

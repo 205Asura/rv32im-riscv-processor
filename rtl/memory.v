@@ -13,10 +13,10 @@ module memory #(
     input      [`REG_SIZE-1:0] store_data_to_dmem,
     input      [        3:0] store_we_to_dmem
 );
-    reg [`REG_SIZE-1:0] mem_array[0:NUM_WORDS-1];
+    reg [`REG_SIZE-1:0] mem_array [0:NUM_WORDS-1];
 
     initial begin
-        $readmemh("mem_initial_contents.hex", mem_array);
+        $readmemh("../rtl/mem_initial_contents.hex", mem_array);
     end
 
     localparam AddrMsb = $clog2(NUM_WORDS) + 1;

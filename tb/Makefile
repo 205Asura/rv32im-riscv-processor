@@ -2,7 +2,7 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 
 # Point to the parent directory where the Verilog files live
-SRC_DIR = $(PWD)/../rtl/
+SRC_DIR = $(PWD)/../rtl
 
 # Add the source directory to the include path for header.vh
 COMPILE_ARGS += -I$(SRC_DIR)

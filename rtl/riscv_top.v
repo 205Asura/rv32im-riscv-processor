@@ -14,7 +14,7 @@ module riscv_top (
     wire [(8*32)-1:0] test_case;
 
     memory #(
-        .NUM_WORDS(30)
+        .NUM_WORDS(512)
     ) memory (
         .rst                 (rst),
         .clk                 (clk),

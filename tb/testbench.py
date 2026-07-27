@@ -12,9 +12,9 @@ DIVIDER_STAGES = 8
 def assertEquals(expected, actual, msg=""):
     """Helper to replace the missing cocotb_utils.assertEquals"""
     # Convert cocotb BinaryValue to integer if needed
-    if hasattr(actual, "integer"):
+    if hasattr(actual, "to_unsigned()"):
         try:
-            actual_val = actual.integer
+            actual_val = actual.to_unsigned()
         except ValueError:
             # Handle cases where the register might be 'x' or 'z'
             actual_val = str(actual)
@@ -66,7 +66,7 @@ def assemble_and_load(dut, asm_code):
 async def preTestSetup(dut, asm_code):
     """Setup the DUT. MUST be called at the start of EACH test."""
     # Start a 4ns clock (from original script)
-    cocotb.start_soon(Clock(dut.clk, 4, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 4, unit="ns").start())
     await RisingEdge(dut.clk)
 
     # Raise `rst` signal
@@ -96,7 +96,7 @@ async def testLui(dut):
     assertEquals(
         0x12345000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -113,12 +113,12 @@ async def testLuiLui(dut):
     assertEquals(
         0x12345000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         0x6789A000,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -137,7 +137,7 @@ async def testAddi3(dut):
     assertEquals(
         3,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -155,7 +155,7 @@ async def testMX1(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -173,7 +173,7 @@ async def testMX2(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -192,7 +192,7 @@ async def testWX1(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -211,7 +211,7 @@ async def testWX2(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -231,7 +231,7 @@ async def testWD1(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -251,7 +251,7 @@ async def testWD2(dut):
     assertEquals(
         42,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -273,22 +273,22 @@ async def testX0Bypassing(dut):
     assertEquals(
         0,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         0,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         0,
         dut.datapath.rf.regs[3].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         1,
         dut.datapath.rf.regs[4].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -308,7 +308,7 @@ async def testBneNotTaken(dut):
     assertEquals(
         0x54321000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -328,7 +328,7 @@ async def testBeqNotTaken(dut):
     assertEquals(
         0x54321000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -350,7 +350,7 @@ async def testBneTaken(dut):
     assertEquals(
         0x12345000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -373,7 +373,7 @@ async def testBeqTaken(dut):
     assertEquals(
         0x12345000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -397,7 +397,7 @@ async def testLoadUse1(dut):
     assertEquals(
         0x0000_2083,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -416,7 +416,7 @@ async def testLoadUse2(dut):
     assertEquals(
         0x0000_2083,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -435,7 +435,7 @@ async def testLoadFalseUse(dut):
     assertEquals(
         0xFE00_7000,
         dut.datapath.rf.regs[1].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -454,7 +454,7 @@ async def testWMData(dut):
     assertEquals(
         0x0000_2083,
         dut.memory.mem_array[3].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -474,13 +474,13 @@ async def testWMData(dut):
 #     assertEquals(
 #         0,
 #         dut.memory.mem_array[int(loadValue / 4)].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 #     await ClockCycles(dut.clk, 1)  # sb reaches M stage, writes to memory
 #     assertEquals(
 #         0x8300_0000,
 #         dut.memory.mem_array[int(loadValue / 4)].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 
 
@@ -498,7 +498,7 @@ async def testDiv(dut):
     assertEquals(
         1,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -517,12 +517,12 @@ async def testDiv(dut):
 #     assertEquals(
 #         1,
 #         dut.datapath.rf.regs[2].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 #     assertEquals(
 #         1,
 #         dut.datapath.rf.regs[3].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 
 
@@ -549,7 +549,7 @@ async def testDiv(dut):
 #         assertEquals(
 #             1,
 #             dut.datapath.rf.regs[2 + i].value,
-#             f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#             f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #         )
 
 
@@ -568,18 +568,18 @@ async def testDiv(dut):
 #     assertEquals(
 #         1,
 #         dut.datapath.rf.regs[2].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 #     assertEquals(
 #         0,
 #         dut.datapath.rf.regs[3].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 #     await ClockCycles(dut.clk, DIVIDER_STAGES + 1)
 #     assertEquals(
 #         1,
 #         dut.datapath.rf.regs[3].value,
-#         f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+#         f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
 #     )
 
 
@@ -599,19 +599,19 @@ async def testDivNonDiv(dut):
     assertEquals(
         1,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         0,
         dut.datapath.rf.regs[3].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     await ClockCycles(dut.clk, 1)
     # now addi has written back
     assertEquals(
         7,
         dut.datapath.rf.regs[3].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -631,12 +631,12 @@ async def testDivUse(dut):
     assertEquals(
         1,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         2,
         dut.datapath.rf.regs[3].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -656,12 +656,12 @@ async def testDivToStoreData(dut):
     assertEquals(
         1,
         dut.memory.mem_array[4].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         1,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 
@@ -681,12 +681,12 @@ async def testDivToStoreAddress(dut):
     assertEquals(
         1,
         dut.datapath.rf.regs[2].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
     assertEquals(
         1,
         dut.memory.mem_array[6].value,
-        f"failed at cycle {dut.datapath.cycles_current.value.integer}",
+        f"failed at cycle {dut.datapath.cycles_current.value.to_unsigned()}",
     )
 
 

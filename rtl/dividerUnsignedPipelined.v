@@ -18,7 +18,6 @@ module DividerUnsignedPipelined (
     generate
         for (i = 0; i < 8; i = i + 1) begin : pipe_stages
             
-            // 1. Prepare Stage Inputs
             wire [31:0] stage_dvd_in;
             wire [31:0] stage_div_in;
             wire [31:0] stage_rem_in;
@@ -36,7 +35,6 @@ module DividerUnsignedPipelined (
                 assign stage_quo_in = pipe_quo[i-1];
             end
 
-            // 2. Combinational Logic (4 Iterations)
             wire [31:0] temp_dvd [0:4];
             wire [31:0] temp_rem [0:4];
             wire [31:0] temp_quo [0:4];
@@ -46,7 +44,7 @@ module DividerUnsignedPipelined (
             assign temp_quo[0] = stage_quo_in;
 
             for (j = 0; j < 4; j = j + 1) begin : loop_iters
-                divu_1iter_lab4 u_iter (
+                divu_1iter u_iter (
                     .i_dividend (temp_dvd[j]),
                     .i_divisor  (stage_div_in),
                     .i_remainder(temp_rem[j]),
@@ -57,10 +55,8 @@ module DividerUnsignedPipelined (
                 );
             end
 
-            // 3. Sequential Logic (Pipeline Update)
             always @(posedge clk) begin
                 if (rst) begin
-                    // [FIX] Reset EVERYTHING. No "if (i < 7)" here.
                     pipe_rem[i] <= 0;
                     pipe_quo[i] <= 0;
                     pipe_div[i] <= 0;
@@ -82,7 +78,6 @@ module DividerUnsignedPipelined (
                         // Last stage writes to output ports
                         o_remainder <= temp_rem[4];
                         o_quotient  <= temp_quo[4];
-                        // Optional: Write to internal regs too to avoid "unused" warnings
                         pipe_rem[i] <= temp_rem[4];
                         pipe_quo[i] <= temp_quo[4];
                         pipe_div[i] <= stage_div_in;
@@ -95,8 +90,7 @@ module DividerUnsignedPipelined (
 
 endmodule
 
-// Include the 1-iter module (Keep this as you had it)
-module divu_1iter_lab4 (
+module divu_1iter (
     input  [31:0] i_dividend,
     input  [31:0] i_divisor,
     input  [31:0] i_remainder,

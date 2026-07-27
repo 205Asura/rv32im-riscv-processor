@@ -17,9 +17,7 @@ module DatapathPipelined (
     // The bits of the inst currently in Writeback. 0 if not a valid inst.
     output reg [`INST_SIZE-1:0] trace_writeback_inst
 );
-    // =========================================================================
     // Opcodes & Constants
-    // =========================================================================
     localparam [`OPCODE_SIZE-1:0] OpLoad    = 7'b000_0011;
     localparam [`OPCODE_SIZE-1:0] OpStore   = 7'b010_0011;
     localparam [`OPCODE_SIZE-1:0] OpBranch  = 7'b110_0011;
@@ -38,13 +36,11 @@ module DatapathPipelined (
         else cycles_current <= cycles_current + 1;
     end
 
-    // =========================================================================
     // PIPELINE REGISTER DEFINITIONS
-    // =========================================================================
     
-    // --- IF/ID Pipeline Registers ---
+    //  IF/ID Pipeline Registers 
     reg [31:0] d_pc, d_inst;
-    // --- ID/EX Pipeline Registers ---
+    //  ID/EX Pipeline Registers 
     reg [31:0] x_pc, x_inst;
     reg [31:0] x_rs1_data, x_rs2_data;
     // Raw values from RegFile (after WD bypass)
@@ -52,7 +48,7 @@ module DatapathPipelined (
     reg [4:0]  x_rd;
     reg        x_reg_write, x_mem_read, x_mem_write;
     reg        x_halt;
-    // --- EX/MEM Pipeline Registers ---
+    //  EX/MEM Pipeline Registers 
     reg [31:0] m_pc, m_inst;
     reg [31:0] m_alu_res;
     reg [31:0] m_rs2_data;
@@ -60,7 +56,7 @@ module DatapathPipelined (
     reg [4:0]  m_rd;
     reg        m_reg_write, m_mem_read, m_mem_write;
     reg        m_halt;
-    // --- MEM/WB Pipeline Registers ---
+    //  MEM/WB Pipeline Registers 
     reg [31:0] w_pc, w_inst;
     reg [31:0] w_alu_res;
     reg [31:0] w_mem_data;
@@ -68,9 +64,7 @@ module DatapathPipelined (
     reg        w_reg_write;
     reg        w_halt;
 
-    // =========================================================================
     // WIRES & HAZARD SIGNALS
-    // =========================================================================
     
     wire stall_pipeline;
     wire flush_decode;
@@ -87,9 +81,7 @@ module DatapathPipelined (
     reg  [3:0] div_counter;
     wire div_stall;
 
-    // =========================================================================
     // 1. FETCH STAGE (F)
-    // =========================================================================
     
     reg [31:0] f_pc;
     // Next PC Logic
@@ -189,7 +181,7 @@ module DatapathPipelined (
     wire d_is_store     = (d_opcode == OpStore);
     wire d_is_ecall     = (d_opcode == OpEnviron) && (d_inst[31:7] == 0);
     
-    // --- HAZARD DETECTION UNIT ---
+    //  HAZARD DETECTION UNIT 
     wire d_uses_rs1 = (d_opcode == OpRegReg) || (d_opcode == OpRegImm) || 
                       (d_opcode == OpLoad)   || (d_opcode == OpStore) || 
                       (d_opcode == OpBranch) || (d_opcode == OpJalr);

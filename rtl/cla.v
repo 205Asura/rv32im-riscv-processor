@@ -43,13 +43,13 @@ module gp4(input wire [3:0] gin, pin,
        .gin(gin[1:0]),
        .pin(pin[1:0]),
        .cin(cin),
-       .gout(g_low),
-       .pout(p_low),
+       .gout(g_low), // g_10
+       .pout(p_low), // p_10
        .cout(cout[0])
    );
    
    // Carry into upper 2 bits
-   assign c2 = g_low | (p_low & cin);
+   assign c2 = g_low | (p_low & cin); // g_10 | (p_10 & c_0)
    
    // Process upper 2 bits (bits 3-2)
    gp2 gp2_high (

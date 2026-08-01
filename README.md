@@ -26,20 +26,6 @@ rv32im-riscv-processor/
 │   ├── memory.v
 │   ├── regfile.v
 │   └── riscv_top.v
-├── scripts/
-│   ├── gds/
-│   │   └── gds.py
-│   ├── pd/
-│   │   ├── constraints.sdc
-│   │   ├── constraints.xdc
-│   │   ├── pd_poststa.tcl
-│   │   └── riscv_top.def
-│   ├── sim/
-│   │   └── run.do
-│   ├── sta/
-│   └── synth/
-│       ├── riscv_top_netlist.v
-│       └── synth.tcl
 └── tb/
     ├── Makefile
     ├── tb_riscv_top.v
